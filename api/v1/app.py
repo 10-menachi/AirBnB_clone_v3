@@ -3,10 +3,10 @@
 
 from flask import Flask
 from models import storage
-from api.v1.views.index import index
+from api.v1.views.index import app_views
 
 app = Flask(__name__)
-app.register_blueprint(index)
+app.register_blueprint(app_views)
 
 
 @app.teardown_appcontext
