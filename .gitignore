@@ -1,0 +1,16 @@
+# Python virtual environment
+venv/
+
+# Byte-compiled files
+*.pyc
+__pycache__/
+
+# Environment variables file
+.env
+
+# IDE settings
+.vscode/
+.idea/
+
+# Logs
+*.log
