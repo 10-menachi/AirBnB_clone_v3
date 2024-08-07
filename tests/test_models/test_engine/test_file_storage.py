@@ -94,6 +94,29 @@ class TestFileStorage(unittest.TestCase):
         self.assertIsNone(non_existent)
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """Test the `count` method of FileStorage"""
+        storage = FileStorage()
+        initial_count = storage.count()
+
+        # Add new instances and check the count
+        for key, value in classes.items():
+            instance = value()
+            storage.new(instance)
+        storage.save()
+        new_count = storage.count()
+
+        self.assertEqual(new_count, initial_count + len(classes))
+
+        # Add a new instance to check count increment
+        new_instance = Amenity()
+        storage.new(new_instance)
+        storage.save()
+        incremented_count = storage.count()
+
+        self.assertEqual(incremented_count, new_count + 1)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_new(self):
         """test that new adds an object to the FileStorage.__objects attr"""
         storage = FileStorage()
