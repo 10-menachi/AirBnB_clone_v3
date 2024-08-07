@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""Flask app"""
 
 from flask import Flask
 from models import storage
