@@ -79,6 +79,21 @@ class TestFileStorage(unittest.TestCase):
         self.assertIs(new_dict, storage._FileStorage__objects)
 
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get(self):
+        """Test the `get` method of FileStorage"""
+        storage = FileStorage()
+        instance = Amenity()
+        storage.new(instance)
+        storage.save()
+
+        retrieved_instance = storage.get(Amenity, instance.id)
+
+        self.assertEqual(retrieved_instance, instance)
+
+        non_existent = storage.get(Amenity, "nonexistent_id")
+        self.assertIsNone(non_existent)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_new(self):
         """test that new adds an object to the FileStorage.__objects attr"""
         storage = FileStorage()
