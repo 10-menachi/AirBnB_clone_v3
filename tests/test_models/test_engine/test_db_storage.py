@@ -14,10 +14,9 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-import json
-import os
 import pep8
 import unittest
+
 DBStorage = db_storage.DBStorage
 classes = {"Amenity": Amenity, "City": City, "Place": Place,
            "Review": Review, "State": State, "User": User}
@@ -68,21 +67,81 @@ test_db_storage.py'])
                             "{:s} method needs a docstring".format(func[0]))
 
 
-class TestFileStorage(unittest.TestCase):
-    """Test the FileStorage class"""
+class TestDBStorage(unittest.TestCase):
+    """Test the DBStorage class"""
+
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_returns_dict(self):
-        """Test that all returns a dictionaty"""
+        """Test that all returns a dictionary"""
         self.assertIs(type(models.storage.all()), dict)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_all_no_class(self):
         """Test that all returns all rows when no class is passed"""
+        all_objects = models.storage.all()
+        self.assertIsInstance(all_objects, dict)
+        self.assertGreaterEqual(len(all_objects), 0)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_new(self):
-        """test that new adds an object to the database"""
+        """Test that new adds an object to the database"""
+        initial_count = models.storage.count(State)
+        state = State(name="California")
+        models.storage.new(state)
+        models.storage.save()
+        self.assertEqual(models.storage.count(State), initial_count + 1)
 
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
-        """Test that save properly saves objects to file.json"""
+        """Test that save properly saves objects to the database"""
+        state = State(name="New York")
+        models.storage.new(state)
+        models.storage.save()
+        retrieved_state = models.storage.get(State, state.id)
+        self.assertIsNotNone(retrieved_state)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get(self):
+        """Test that get retrieves the correct object"""
+        state = State(name="California")
+        models.storage.new(state)
+        models.storage.save()
+        retrieved_state = models.storage.get(State, state.id)
+        self.assertEqual(retrieved_state, state)
+        self.assertIsNotNone(retrieved_state)
+        self.assertEqual(retrieved_state.id, state.id)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_non_existent(self):
+        """Test that get returns None when no object is found"""
+        self.assertIsNone(models.storage.get(State, "non-existent-id"))
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count(self):
+        """Test that count returns the correct number of objects"""
+        initial_count = models.storage.count()
+        state = State(name="Nevada")
+        models.storage.new(state)
+        models.storage.save()
+        self.assertEqual(models.storage.count(), initial_count + 1)
+        self.assertEqual(models.storage.count(State), initial_count + 1)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_class(self):
+        """Test that count returns the correct number of objects for a class"""
+        state_count = models.storage.count(State)
+        state = State(name="Arizona")
+        models.storage.new(state)
+        models.storage.save()
+        self.assertEqual(models.storage.count(State), state_count + 1)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_no_class(self):
+        """Test that count returns the correct number of all objects"""
+        initial_count = models.storage.count()
+        state = State(name="Oregon")
+        user = User(email="user@example.com", password="password")
+        models.storage.new(state)
+        models.storage.new(user)
+        models.storage.save()
+        self.assertEqual(models.storage.count(), initial_count + 2)
