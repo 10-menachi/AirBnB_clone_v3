@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 """States API"""
-
 from api import app
 from models import storage
 from models.state import State
